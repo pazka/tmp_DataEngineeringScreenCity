@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "C#: ssd_screencity_dataengineering",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\ssd_screencity_dataengineering\\ssd_screencity_dataengineering.csproj",
+            "launchConfigurationId": "TargetFramework=;ssd_screencity_dataengineering"
+        }
+    ]
+}
