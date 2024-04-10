@@ -12,7 +12,35 @@ namespace ssd_screencity_dataengineering
         static float MaxLines = 34636765;
         static void Main(string[] args)
         {
-            StoreCsv();
+            List<string> data = new List<string>();
+            var patchOfEtablissementFiles = @"C:\Users\Pazka\Documents\Code\Seine-Saint-Denis_ScreenCityDataEngineering\ssd_screencity_dataengineering\data\etablissements_{i}.csv";
+            var header = "";
+            for (int i = 1; i < 4; i++)
+            {
+                string path = patchOfEtablissementFiles.Replace("{i}", i.ToString());
+                using (StreamReader file = new StreamReader(path))
+                {
+                    string line;
+                    //ignore the first line
+                    header = file.ReadLine();
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        data.Add(line);
+                    }
+                }
+            }
+
+            Console.WriteLine($"There are {data.Count} lines in the files.");
+
+            using(StreamWriter file = new StreamWriter(@"C:\Users\Pazka\Documents\Code\Seine-Saint-Denis_ScreenCityDataEngineering\ssd_screencity_dataengineering\data\etablissements.csv"))
+            {
+                file.WriteLine(header);
+                foreach (var line in data)
+                {
+                    file.WriteLine(line);
+                }
+            }
+
         }
 
         static void PrintProgression(int i)
@@ -21,7 +49,7 @@ namespace ssd_screencity_dataengineering
             {
                 Console.WriteLine(i / Program.MaxLines * 100.0 + "%");
             }
-        }
+        } 
 
         public static int CountLinesInFile(string path)
         {
@@ -40,58 +68,12 @@ namespace ssd_screencity_dataengineering
         }
 
 
-        public static void StoreCsv()
-        {
-            string path = @"C:\Users\Pazka\Documents\Code\Seine-Saint-Denis_ScreenCityDataEngineering\ssd_screencity_dataengineering\data\GeolocalisationEtablissement_Sirene_pour_etudes_statistiques_utf8.csv";
-
-            CountLinesInFile(path);
-            string[][] dataLines = new string[34636765][]; // 34M lines
-            SortedDictionary<string, int> linesIndexes = new SortedDictionary<string, int>();
-
-            using (StreamReader file = new StreamReader(path))
-            {
-                int i = 0;
-                file.ReadLine(); // skip the first line
-
-                string line = file.ReadLine();
-                Console.WriteLine("Reading file...");
-                do
-                {
-                    PrintProgression(i);
-
-                    string[] lineArray = line.Split(";");
-                    string lineIdx = lineArray[0];
-                    dataLines[i] = lineArray;
-                    linesIndexes.Add(lineIdx, i);
-
-                    line = file.ReadLine();
-                    i++;
-                } while (line != null);
-
-                Console.WriteLine("Went up to " + i + " lines in the file.");
-            }
-
-            WriteSortedCSV(dataLines, linesIndexes);
-        }
-
-        public static void WriteSortedCSV(string[][] dataLines, SortedDictionary<string, int> linesIndexes)
+        public static void LoadGeoloc()
         {
             string path = @"C:\Users\Pazka\Documents\Code\Seine-Saint-Denis_ScreenCityDataEngineering\ssd_screencity_dataengineering\data\GeolocalisationEtablissement_Sirene_pour_etudes_statistiques_utf8_sorted.csv";
-            int i = 0;
-            using (StreamWriter file = new StreamWriter(path))
-            {
-                Console.WriteLine("Writing to file...");
 
-                foreach (var lineIdx in linesIndexes)
-                {
-                    PrintProgression(i);
-                    string[] line = dataLines[lineIdx.Value];
-                    string lineStr = string.Join(";", line);
-                    file.WriteLine(lineStr);
-                }
-            }
-
-            Console.WriteLine("Wrote " + i + " lines in the file.");
+            //TODO load geo loc in an array
         }
+
     }
 }
