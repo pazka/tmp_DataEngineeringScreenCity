@@ -2,12 +2,21 @@
 
 ## Objective
 
-Store all data into a mysql db for a better browse of the csv file
+Aggregation, cleaning and formating of all the data relating to Sein-Saint-Denis in preparation of a usage for DataVisuV2 for the art piece "ScreenCity"
 
-once everything is loaded , another part of the program will create unified table for the data
+## Data sources
 
-## Mysql docker run command
+|file|source|coordinates systems
+|---|---|
+|sirene of seine saint denis files extraction in 2019 | <https://www.sirene.fr/sirene/public/creation-fichier>|
+|All sirene geolocalisation (32 Million lines) | <https://www.data.gouv.fr/fr/datasets/geolocalisation-des-etablissements-du-repertoire-sirene-pour-les-etudes-statistiques/>|RGF93 Lambert 93 => WGS 84
+|Population density of 2019 | <https://www.geoportail.gouv.fr/donnees/densite-de-population>|CRS3035
+|Contour administratifs | <https://www.data.gouv.fr/fr/datasets/contours-des-departements-francais-issus-d-openstreetmap/#/resources>| CRS84
+
+## Projection conversion with ogr2ogr
 
 ```bash
-docker run --name mysql -e MYSQL_ROOT_PASSWORD=root -d -p 3306:3306 mysql:5.7
+ogr2ogr -f GeoJSON -s_srs <my_file>.prj -t_srs EPSG:2154 <myfile>.geojson <my_file>.shp
 ```
+
+EPSG coordinate gotten form <https://fr.wikipedia.org/wiki/Syst%C3%A8me_de_coordonn%C3%A9es_(cartographie)#Les_codes_EPSG>

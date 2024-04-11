@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using MySql.Data.MySqlClient;
 
 namespace ssd_screencity_dataengineering
@@ -7,6 +9,11 @@ namespace ssd_screencity_dataengineering
     class Program
     {
         static void Main(string[] args)
+        {
+            StoreCsv();
+        }
+
+        static void StoreInSql(string[] args)
         {
             MySqlConnection myConnection;
             string myConnectionString;
@@ -25,7 +32,7 @@ namespace ssd_screencity_dataengineering
                 Console.WriteLine(ex.Message);
             }
         }
-
+        
         public static int CountLinesInFile(string path)
         {
             int count = 0;
@@ -45,38 +52,64 @@ namespace ssd_screencity_dataengineering
         public static void AssignCsvToTable(MySqlConnection myConnection)
         {
             string path = @"C:\Users\Alexa\Documents\Projects\Alessia\Seine-Saint-Denis_ScreenCityDataEngineering\ssd_screencity_dataengineering\data\GeolocalisationEtablissement_Sirene_pour_etudes_statistiques_utf8.csv";
-            float maxLines = 34636765 ;
-            CountLinesInFile(path);
-
+            // Read the file and display it line by line.  
             StreamReader file = new StreamReader(path);
             string line;
-            float i = 0;
-            line = file.ReadLine(); // skip the first line
-            while (line != null)
+            var i = 0;
+            file.ReadLine(); // skip the first line
+            do 
             {
-                line = file.ReadLine();
-                if(i < 25977573) // skip the first 17M lines (already in the database)
+                if(i % 1000 == 0)
                 {
-                    i++;
-                    continue;
-                }
-
-                if (i % 1000 == 0)
-                {
-                    Console.WriteLine((i / maxLines ) * 100 + "%");
+                    Console.WriteLine( i / 153996 *100 + "%");
                 }
 
                 line = file.ReadLine();
                 string[] lineArray = line.Split(";");
                 AddNewLineInTable(lineArray, myConnection);
                 i++;
-            }
+            }while (line != null);
+
+            Console.WriteLine("There are " + i + " lines in the file.");
+            file.Close();
+         }
+
+         
+        public static void StoreCsv()
+        {
+            string path = @"C:\Users\Alexa\Documents\Projects\Alessia\Seine-Saint-Denis_ScreenCityDataEngineering\ssd_screencity_dataengineering\data\GeolocalisationEtablissement_Sirene_pour_etudes_statistiques_utf8.csv";
+            float maxLines = 34636765 ;
+            CountLinesInFile(path);
+
+            StreamReader file = new StreamReader(path);
+            string[][] dataLines = new string[34636765][]; // 34M lines
+            SortedDictionary<BigInteger,int> linesIndexes = new SortedDictionary<BigInteger,int>();
+
+            int i = 0;
+            file.ReadLine(); // skip the first line
+            string line;
+            do 
+            {
+                line = file.ReadLine();
+                
+                if (i % 10000 == 0)
+                {
+                    Console.WriteLine((i / maxLines ) * 100 + "%");
+                }
+
+                string[] lineArray = line.Split(";");
+                BigInteger lineIdx = BigInteger.Parse(lineArray[0]);
+                dataLines[i] = lineArray;
+                linesIndexes.Add(lineIdx, i);
+
+                i++;
+            }while (line != null);
 
             Console.WriteLine("Went up to " + i + " lines in the file.");
             file.Close();
         }
 
-        public static void AddNewLineInTable(string[] line, MySqlConnection myConnection)
+        public static void AddNewLineInTable(string[] line,MySqlConnection myConnection)
         {
             // create a MySQL command and set the SQL statement with parameters
             MySqlCommand myCommand = new MySqlCommand();
@@ -99,7 +132,6 @@ namespace ssd_screencity_dataengineering
             myCommand.Parameters.AddWithValue("@qualite_qva", line[14]);
             myCommand.Parameters.AddWithValue("@y_latitude", line[15]);
             myCommand.Parameters.AddWithValue("@x_longitude", line[16]);
-
 
             // execute the command
             myCommand.ExecuteNonQuery();

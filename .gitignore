@@ -1,3 +1,7 @@
 *.csv
 bin/
 obj/
+*.*json
+*.shp
+*.shx
+*.prj
