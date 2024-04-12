@@ -20,3 +20,7 @@ ogr2ogr -f GeoJSON -s_srs <my_file>.prj -t_srs EPSG:2154 <myfile>.geojson <my_fi
 ```
 
 EPSG coordinate gotten form <https://fr.wikipedia.org/wiki/Syst%C3%A8me_de_coordonn%C3%A9es_(cartographie)#Les_codes_EPSG>
+
+## Population density
+
+The coordinate is that of the bottom left corner of the square
