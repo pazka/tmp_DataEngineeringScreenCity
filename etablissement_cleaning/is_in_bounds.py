@@ -26,8 +26,10 @@ bounds_polygon = shapely.geometry.Polygon(bounds_as_tuples)
 
 i = 0
 in_bounds = 0
-with open(BASE_PATH+'/carreaux_200m_SSD_wgs84.csv', 'r') as src_file:
-    with open(BASE_PATH+'/carreaux_200m_SaintDenis_wgs84.csv', 'w') as dest_file:
+
+# HEADER : siren,dateCreationEtablissement,denominationUniteLegale,isOnePerson,X,Y
+with open(BASE_PATH+'/etablissements_SSD_geoloc_cleaned.csv', 'r') as src_file:
+    with open(BASE_PATH+'/etablissements_SaintDenis_geoloc_cleaned.csv', 'w') as dest_file:
         header = src_file.readline()
         dest_file.write(header)
 
@@ -35,15 +37,15 @@ with open(BASE_PATH+'/carreaux_200m_SSD_wgs84.csv', 'r') as src_file:
 
         while line and len(line) > 0:
             i += 1
-            coordinates = line.split(',')[0].split(';')[1:3]
-            N = float(coordinates[1])
-            E = float(coordinates[0])
+            data = line.split(',')
+            E = float(data[4])
+            N = float(data[5])
 
             if bounds_polygon.contains(shapely.geometry.Point(N, E)):
                 in_bounds += 1
-                print(f'{in_bounds}/{i} in bounds ! ')
                 dest_file.write(line)
 
             if (i % 10000 == 0):
-                print(f'Processed {round(i/2287885*100)}%, {i}/2287885')
+                print(f'Processed {round(i/351337*100)}%, {i}/351337, {in_bounds} in bounds')
+
             line = src_file.readline()

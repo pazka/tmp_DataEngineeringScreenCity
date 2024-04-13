@@ -123,9 +123,9 @@ def convert_csv_line_to_json_object(line) -> dict:
     }
 
 i = 0
-with open(BASE_PATH+'/carreaux_200m_SSD_wgs84.json', 'w') as dest_file:
+with open(BASE_PATH+'/carreaux_200m_SaintDenis_wgs84.json', 'w') as dest_file:
     dest_file.write('[')
-    with open(BASE_PATH+'/carreaux_200m_SSD_wgs84.csv', 'r') as src_file:
+    with open(BASE_PATH+'/carreaux_200m_SaintDenis_wgs84.csv', 'r') as src_file:
         src_file.readline() # skip the header
         line = src_file.readline()
         while line is not None and line != '':
